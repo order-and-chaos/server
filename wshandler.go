@@ -98,6 +98,10 @@ func WsHandler(ws *websocket.Conn) {
 				notifyOthers("setnick", oldNick, player.Nickname)
 				reply("ok", player.Nickname)
 
+			case "getnick":
+				if !argreply(0) {continue}
+				reply("ok", player.Nickname)
+
 			case "joinroom":
 				if !argreply(1) {continue}
 				_, err := joinRoom(msg.Arguments[0])

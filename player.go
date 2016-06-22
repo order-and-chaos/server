@@ -1,14 +1,26 @@
 package main
 
-import "golang.org/x/net/websocket"
+import (
+	"fmt"
+	"math/rand"
+
+	"golang.org/x/net/websocket"
+)
 
 type Player struct {
 	Conn     *Connection
 	Nickname string
 }
 
+var nameBases = []string{"user","player","person","rip","oc","car","mouse","frog","piano"}
+
+func genNickname() string {
+	return fmt.Sprintf("%s%d", nameBases[rand.Intn(len(nameBases))], rand.Intn(1000))
+}
+
 func makePlayer(ws *websocket.Conn) *Player {
 	return &Player{
 		Conn: makeConnection(ws),
+		Nickname: genNickname(),
 	}
 }
