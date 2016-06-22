@@ -78,7 +78,7 @@ func WsHandler(ws *websocket.Conn) {
 				player.Conn.Reply(msg.ID, typ, args...)
 			}
 
-			argcheck := func(count int) bool {
+			argreply := func(count int) bool {
 				if len(msg.Arguments) != count {
 					reply("error", "format")
 					return false
@@ -88,18 +88,18 @@ func WsHandler(ws *websocket.Conn) {
 
 			switch msg.Type {
 			case "ping":
-				if !argcheck(0) {continue}
+				if !argreply(0) {continue}
 				reply("pong")
 
 			case "setnick":
-				if !argcheck(1) {continue}
+				if !argreply(1) {continue}
 				oldNick := player.Nickname
 				player.Nickname = msg.Arguments[0]
 				notifyOthers("setnick", oldNick, player.Nickname)
 				reply("ok", player.Nickname)
 
 			case "joinroom":
-				if !argcheck(1) {continue}
+				if !argreply(1) {continue}
 				_, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
@@ -108,7 +108,7 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "leaveroom":
-				if !argcheck(0) {continue}
+				if !argreply(0) {continue}
 				err := leaveRoom()
 				if err != nil {
 					reply("error", err.Error())
@@ -117,7 +117,7 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "makeroom":
-				if !argcheck(0) {continue}
+				if !argreply(0) {continue}
 				room := mkRoom()
 				joinRoom(room.ID)
 				reply("ok", room.ID)
