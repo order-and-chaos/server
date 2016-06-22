@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -31,6 +33,8 @@ func printHelp() {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	port := defaultPort
 
 	if len(os.Args) > 1 {
