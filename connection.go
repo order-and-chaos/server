@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"log"
 
 	"golang.org/x/net/websocket"
 )
@@ -21,6 +22,7 @@ type Message struct {
 
 func makeConnection(ws *websocket.Conn) *Connection {
 	conn := &Connection{
+		Chan: make(chan Message),
 		ws: ws,
 	}
 	reader := bufio.NewReader(ws)
@@ -29,15 +31,22 @@ func makeConnection(ws *websocket.Conn) *Connection {
 		for {
 			raw, err := reader.ReadBytes('\n')
 			if err != nil {
+				if err.Error() != "EOF" {
+					log.Printf("error while reading from connection: %#v\n", err)
+				}
 				close(conn.Chan)
 				return
 			}
 
 			var msg Message
-			json.Unmarshal(raw, &msg)
+			if json.Unmarshal(raw, &msg) != nil {
+				log.Printf("invalid message received: %s\n", raw)
+				continue
+			}
 			if msg.ID > conn.currentID {
 				conn.currentID = msg.ID
 			}
+			conn.Chan <- msg
 		}
 	}()
 
@@ -45,16 +54,22 @@ func makeConnection(ws *websocket.Conn) *Connection {
 }
 
 func (conn *Connection) Send(typ string, args ...string) (n int, err error) {
+	if args == nil {
+		args = make([]string, 0)
+	}
+	conn.currentID++
 	n, err = conn.write(Message{
 		ID:        conn.currentID,
 		Type:      typ,
 		Arguments: args,
 	})
-	conn.currentID++
 	return
 }
 
 func (conn *Connection) Reply(id int, typ string, args ...string) (n int, err error) {
+	if args == nil {
+		args = make([]string, 0)
+	}
 	return conn.write(Message{
 		ID:        id,
 		Type:      typ,

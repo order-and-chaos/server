@@ -1,4 +1,4 @@
-BIN := order-and-chaos
+BIN := server
 SOURCE := $(wildcard *.go)
 
 .PHONY: all remake clean

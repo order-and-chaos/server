@@ -11,7 +11,7 @@ import (
 
 const defaultPort = "1337"
 
-var roomMap = make(map[string]*Room)
+var roomMap = make(map[string] *Room)
 
 func mkRoom() *Room {
 	id := UniqIdf()
