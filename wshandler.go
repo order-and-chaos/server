@@ -27,9 +27,7 @@ func WsHandler(ws *websocket.Conn) {
 			other.Conn.Send(typ, args...)
 		}
 
-		for _, spectator := range currentRoom.Spectators {
-			spectator.Conn.Send(typ, args...)
-		}
+		currentRoom.sendSpectators(typ, args...)
 	}
 
 	leaveRoom := func() error {
