@@ -5,7 +5,6 @@ type Room struct {
 	PlayerA, PlayerB *Player
 	Spectators       []*Player
 	OnMove           int
-	AReady, BReady   bool
 	Started          bool
 }
 
@@ -15,7 +14,7 @@ func (r *Room) Start() bool {
 		return true
 	}
 
-	if !r.AReady || !r.BReady {
+	if r.PlayerA == nil || r.PlayerB == nil {
 		return false
 	}
 
