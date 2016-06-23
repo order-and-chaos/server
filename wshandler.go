@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"strconv"
 
 	"golang.org/x/net/websocket"
 )
@@ -27,7 +28,7 @@ func WsHandler(ws *websocket.Conn) {
 			other.Conn.Send(typ, args...)
 		}
 
-		currentRoom.sendSpectators(typ, args...)
+		currentRoom.SendSpectators(typ, args...)
 	}
 
 	leaveRoom := func() error {
@@ -76,7 +77,7 @@ func WsHandler(ws *websocket.Conn) {
 				player.Conn.Reply(msg.ID, typ, args...)
 			}
 
-			argreply := func(count int) bool {
+			argcheck := func(count int) bool {
 				if len(msg.Arguments) != count {
 					reply("error", "format")
 					return false
@@ -84,24 +85,35 @@ func WsHandler(ws *websocket.Conn) {
 				return true
 			}
 
+			gamecheck := func() bool {
+				if currentRoom == nil {
+					reply("error", "not-in-room")
+				} else if currentRoom.Board == nil {
+					reply("error", "not-in-game")
+				} else {
+					return true
+				}
+				return false
+			}
+
 			switch msg.Type {
 			case "ping":
-				if !argreply(0) {continue}
+				if !argcheck(0) {continue}
 				reply("pong")
 
 			case "setnick":
-				if !argreply(1) {continue}
+				if !argcheck(1) {continue}
 				oldNick := player.Nickname
 				player.Nickname = msg.Arguments[0]
 				notifyOthers("setnick", oldNick, player.Nickname)
 				reply("ok", player.Nickname)
 
 			case "getnick":
-				if !argreply(0) {continue}
+				if !argcheck(0) {continue}
 				reply("ok", player.Nickname)
 
 			case "joinroom":
-				if !argreply(1) {continue}
+				if !argcheck(1) {continue}
 				_, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
@@ -110,7 +122,7 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "leaveroom":
-				if !argreply(0) {continue}
+				if !argcheck(0) {continue}
 				err := leaveRoom()
 				if err != nil {
 					reply("error", err.Error())
@@ -119,10 +131,91 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "makeroom":
-				if !argreply(0) {continue}
+				if !argcheck(0) {continue}
 				room := mkRoom()
 				joinRoom(room.ID)
 				reply("ok", room.ID)
+
+			case "startgame":
+				if !argcheck(0) {continue}
+				if currentRoom == nil {
+					reply("error", "not-in-room")
+				} else if currentRoom.Board != nil {
+					reply("error", "already-in-game")
+				} else if !currentRoom.StartGame() {
+					reply("error", "not-ready")
+				}
+
+			case "stopgame":
+				if !argcheck(0) || !gamecheck() {continue}
+				currentRoom.StopGame()
+
+			case "getboard":
+				if !argcheck(0) || !gamecheck() {continue}
+				acc := ""
+				for i := 0; i < N*N; i++ {
+					if currentRoom.Board.Cells[i] == OO {
+						acc += "O"
+					} else if currentRoom.Board.Cells[i] == XX {
+						acc += "X"
+					} else {
+						acc += " "
+					}
+				}
+				reply("ok", acc)
+
+			case "getonturn":
+				if !argcheck(0) || !gamecheck() {continue}
+				if currentRoom.Board.Onturn == Order {
+					reply("ok", "order")
+				} else {
+					reply("ok", "chaos")
+				}
+
+			case "applymove":
+				if !argcheck(2) || !gamecheck() {continue}
+
+				var stone Cell
+				if msg.Arguments[0] == "O" {
+					stone = OO
+				} else if msg.Arguments[0] == "X" {
+					stone = XX
+				} else {
+					reply("error", "format-error")
+					continue
+				}
+
+				if (player == currentRoom.PlayerA &&
+				    currentRoom.Board.Onturn != currentRoom.RoleA) ||
+				   (player != currentRoom.PlayerA &&
+				    currentRoom.Board.Onturn == currentRoom.RoleA) {
+					reply("error", "not-on-turn")
+					continue
+				}
+
+				pos, err := strconv.Atoi(msg.Arguments[1])
+				if err != nil || pos < 0 || pos >= N*N {
+					reply("error", "format-error")
+					continue
+				}
+				empty, _ := currentRoom.Board.IsEmpty(pos)
+				if empty {
+					reply("error", "cell-not-empty")
+					continue
+				}
+
+				currentRoom.Board.ApplyMove(stone, pos)
+				reply("ok")
+
+				role, win := currentRoom.Board.CheckWin()
+				if win {
+					if role == Order {
+						currentRoom.SendAll("win", "order")
+					} else {
+						currentRoom.SendAll("win", "chaos")
+					}
+					currentRoom.StopGame()
+				}
 			}
 		}
 	}()
