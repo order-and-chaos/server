@@ -82,5 +82,6 @@ func (conn *Connection) write(msg Message) (n int, err error) {
 	if err != nil {
 		return -1, err
 	}
-	return conn.ws.Write(bytes)
+	withlf := append(bytes, '\n')
+	return conn.ws.Write(withlf)
 }
