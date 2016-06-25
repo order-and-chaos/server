@@ -12,7 +12,7 @@ type Player struct {
 	Nickname string
 }
 
-var nameBases = []string{"user","player","person","rip","oc","car","mouse","frog","piano"}
+var nameBases = []string{"user", "player", "person", "rip", "oc", "car", "mouse", "frog", "piano"}
 
 func genNickname() string {
 	return fmt.Sprintf("%s%d", nameBases[rand.Intn(len(nameBases))], rand.Intn(1000))
@@ -20,7 +20,7 @@ func genNickname() string {
 
 func makePlayer(ws *websocket.Conn) *Player {
 	return &Player{
-		Conn: makeConnection(ws),
+		Conn:     makeConnection(ws),
 		Nickname: genNickname(),
 	}
 }

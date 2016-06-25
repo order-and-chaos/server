@@ -23,7 +23,7 @@ type Message struct {
 func makeConnection(ws *websocket.Conn) *Connection {
 	conn := &Connection{
 		Chan: make(chan Message),
-		ws: ws,
+		ws:   ws,
 	}
 	reader := bufio.NewReader(ws)
 

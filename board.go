@@ -8,20 +8,22 @@ import (
 const N int = 6
 
 type Cell int
+
 const (
 	Empty Cell = -1
-	OO Cell = 0
-	XX Cell = 1
+	OO    Cell = 0
+	XX    Cell = 1
 )
 
 type GameRole int
+
 const (
 	Order = 0
 	Chaos = 1
 )
 
 type Board struct {
-	Cells [N*N]Cell
+	Cells  [N * N]Cell
 	Onturn GameRole
 }
 
@@ -35,7 +37,7 @@ func MakeBoard(startPlayer GameRole) *Board {
 	return bd
 }
 
-func (bd *Board) ApplyMove(stone Cell,pos int) error {
+func (bd *Board) ApplyMove(stone Cell, pos int) error {
 	if pos < 0 || pos >= N*N {
 		return errors.New("Pos out of range in ApplyMove")
 	}
@@ -68,7 +70,7 @@ func (bd *Board) PrintBoard() {
 				fmt.Print("O ")
 			} else if bd.Cells[N*y+x] == XX {
 				fmt.Print("X ")
-			} else  {
+			} else {
 				fmt.Print(". ")
 			}
 		}
@@ -91,7 +93,7 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 	var k int
 	for i := 0; i < N; i++ {
 		for j := 0; j < 2; j++ {
-			stone := bd.Cells[N*i+j]  // Horizontal
+			stone := bd.Cells[N*i+j] // Horizontal
 			if stone != Empty {
 				for k = 1; k < N-1; k++ {
 					if bd.Cells[N*i+j+k] != stone {
@@ -103,7 +105,7 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 				}
 			}
 
-			stone = bd.Cells[N*j+i]  // Vertical
+			stone = bd.Cells[N*j+i] // Vertical
 			if stone != Empty {
 				for k = 1; k < N-1; k++ {
 					if bd.Cells[N*j+i+k] != stone {
@@ -119,7 +121,7 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 
 	for i := 0; i < 2; i++ {
 		for j := 0; j < 2; j++ {
-			stone := bd.Cells[N*i+j]  // Diagonal \
+			stone := bd.Cells[N*i+j] // Diagonal \
 			if stone != Empty {
 				for k = 1; k < N-1; k++ {
 					if bd.Cells[N*(i+j)+j+k] != stone {
@@ -131,7 +133,7 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 				}
 			}
 
-			stone = bd.Cells[N*i+N-1-j]  // Diagonal /
+			stone = bd.Cells[N*i+N-1-j] // Diagonal /
 			if stone != Empty {
 				for k = 1; k < N-1; k++ {
 					if bd.Cells[N*(i+j)+N-1-j-k] != stone {
@@ -145,5 +147,5 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 		}
 	}
 
-	return GameRole(-1), false  // Nobody
+	return GameRole(-1), false // Nobody
 }

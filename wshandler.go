@@ -98,22 +98,30 @@ func WsHandler(ws *websocket.Conn) {
 
 			switch msg.Type {
 			case "ping":
-				if !argcheck(0) {continue}
+				if !argcheck(0) {
+					continue
+				}
 				reply("pong")
 
 			case "setnick":
-				if !argcheck(1) {continue}
+				if !argcheck(1) {
+					continue
+				}
 				oldNick := player.Nickname
 				player.Nickname = msg.Arguments[0]
 				notifyOthers("setnick", oldNick, player.Nickname)
 				reply("ok", player.Nickname)
 
 			case "getnick":
-				if !argcheck(0) {continue}
+				if !argcheck(0) {
+					continue
+				}
 				reply("ok", player.Nickname)
 
 			case "joinroom":
-				if !argcheck(1) {continue}
+				if !argcheck(1) {
+					continue
+				}
 				_, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
@@ -122,7 +130,9 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "leaveroom":
-				if !argcheck(0) {continue}
+				if !argcheck(0) {
+					continue
+				}
 				err := leaveRoom()
 				if err != nil {
 					reply("error", err.Error())
@@ -131,13 +141,17 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "makeroom":
-				if !argcheck(0) {continue}
+				if !argcheck(0) {
+					continue
+				}
 				room := mkRoom()
 				joinRoom(room.ID)
 				reply("ok", room.ID)
 
 			case "startgame":
-				if !argcheck(0) {continue}
+				if !argcheck(0) {
+					continue
+				}
 				if currentRoom == nil {
 					reply("error", "not-in-room")
 				} else if currentRoom.Board != nil {
@@ -147,11 +161,15 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "stopgame":
-				if !argcheck(0) || !gamecheck() {continue}
+				if !argcheck(0) || !gamecheck() {
+					continue
+				}
 				currentRoom.StopGame()
 
 			case "getboard":
-				if !argcheck(0) || !gamecheck() {continue}
+				if !argcheck(0) || !gamecheck() {
+					continue
+				}
 				acc := ""
 				for i := 0; i < N*N; i++ {
 					if currentRoom.Board.Cells[i] == OO {
@@ -165,7 +183,9 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok", acc)
 
 			case "getonturn":
-				if !argcheck(0) || !gamecheck() {continue}
+				if !argcheck(0) || !gamecheck() {
+					continue
+				}
 				if currentRoom.Board.Onturn == Order {
 					reply("ok", "order")
 				} else {
@@ -173,7 +193,9 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 			case "applymove":
-				if !argcheck(2) || !gamecheck() {continue}
+				if !argcheck(2) || !gamecheck() {
+					continue
+				}
 
 				var stone Cell
 				if msg.Arguments[0] == "O" {
@@ -186,9 +208,9 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 				if (player == currentRoom.PlayerA &&
-				    currentRoom.Board.Onturn != currentRoom.RoleA) ||
-				   (player != currentRoom.PlayerA &&
-				    currentRoom.Board.Onturn == currentRoom.RoleA) {
+					currentRoom.Board.Onturn != currentRoom.RoleA) ||
+					(player != currentRoom.PlayerA &&
+						currentRoom.Board.Onturn == currentRoom.RoleA) {
 					reply("error", "not-on-turn")
 					continue
 				}
