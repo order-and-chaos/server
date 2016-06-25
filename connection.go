@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"io"
 	"log"
 
 	"golang.org/x/net/websocket"
@@ -31,7 +32,7 @@ func makeConnection(ws *websocket.Conn) *Connection {
 		for {
 			raw, err := reader.ReadBytes('\n')
 			if err != nil {
-				if err.Error() != "EOF" {
+				if err != io.EOF {
 					log.Printf("error while reading from connection: %#v\n", err)
 				}
 				close(conn.Chan)
