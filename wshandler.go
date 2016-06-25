@@ -38,11 +38,13 @@ func WsHandler(ws *websocket.Conn) {
 			}
 			currentRoom.PlayerB = nil
 			currentRoom = nil
+
 			notifyOthers("joinroom", player.Nickname)
+
 			return nil
-		} else {
-			return errors.New("not-in-room")
 		}
+
+		return errors.New("not-in-room")
 	}
 
 	joinRoom := func(id string) (*Room, error) {
