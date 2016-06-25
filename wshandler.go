@@ -79,81 +79,67 @@ func WsHandler(ws *websocket.Conn) {
 				player.Conn.Reply(msg.ID, typ, args...)
 			}
 
-			argcheck := func(count int) bool {
-				if len(msg.Arguments) != count {
+			handleCommand := func(typ string, argCount int, requiresGame bool, fn func()) {
+				if msg.Type != typ {
+					return
+				}
+
+				if len(msg.Arguments) != argCount {
 					reply("error", "format")
-					return false
+					return
 				}
-				return true
+
+				if requiresGame {
+					if currentRoom == nil {
+						reply("error", "not-in-room")
+						return
+					} else if currentRoom.Board == nil {
+						reply("error", "not-in-game")
+						return
+					}
+				}
+
+				fn()
 			}
 
-			gamecheck := func() bool {
-				if currentRoom == nil {
-					reply("error", "not-in-room")
-				} else if currentRoom.Board == nil {
-					reply("error", "not-in-game")
-				} else {
-					return true
-				}
-				return false
-			}
-
-			switch msg.Type {
-			case "ping":
-				if !argcheck(0) {
-					continue
-				}
+			handleCommand("ping", 0, false, func() {
 				reply("pong")
+			})
 
-			case "setnick":
-				if !argcheck(1) {
-					continue
-				}
+			handleCommand("setnick", 1, false, func() {
 				oldNick := player.Nickname
 				player.Nickname = msg.Arguments[0]
 				notifyOthers("setnick", oldNick, player.Nickname)
 				reply("ok", player.Nickname)
 
-			case "getnick":
-				if !argcheck(0) {
-					continue
-				}
+			})
+			handleCommand("getnick", 0, false, func() {
 				reply("ok", player.Nickname)
+			})
 
-			case "joinroom":
-				if !argcheck(1) {
-					continue
-				}
+			handleCommand("joinroom", 1, false, func() {
 				_, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
 				} else {
 					reply("ok")
 				}
-
-			case "leaveroom":
-				if !argcheck(0) {
-					continue
-				}
+			})
+			handleCommand("leaveroom", 0, false, func() {
 				err := leaveRoom()
 				if err != nil {
 					reply("error", err.Error())
 				} else {
 					reply("ok")
 				}
-
-			case "makeroom":
-				if !argcheck(0) {
-					continue
-				}
+			})
+			handleCommand("makeroom", 0, false, func() {
 				room := mkRoom()
 				joinRoom(room.ID)
 				reply("ok", room.ID)
+			})
 
-			case "startgame":
-				if !argcheck(0) {
-					continue
-				}
+			handleCommand("startgame", 0, false, func() {
 				if currentRoom == nil {
 					reply("error", "not-in-room")
 				} else if currentRoom.Board != nil {
@@ -161,17 +147,12 @@ func WsHandler(ws *websocket.Conn) {
 				} else if !currentRoom.StartGame() {
 					reply("error", "not-ready")
 				}
-
-			case "stopgame":
-				if !argcheck(0) || !gamecheck() {
-					continue
-				}
+			})
+			handleCommand("stopgame", 0, true, func() {
 				currentRoom.StopGame()
+			})
 
-			case "getboard":
-				if !argcheck(0) || !gamecheck() {
-					continue
-				}
+			handleCommand("getboard", 0, true, func() {
 				acc := ""
 				for i := 0; i < N*N; i++ {
 					if currentRoom.Board.Cells[i] == OO {
@@ -183,22 +164,17 @@ func WsHandler(ws *websocket.Conn) {
 					}
 				}
 				reply("ok", acc)
+			})
 
-			case "getonturn":
-				if !argcheck(0) || !gamecheck() {
-					continue
-				}
+			handleCommand("getonturn", 0, true, func() {
 				if currentRoom.Board.Onturn == Order {
 					reply("ok", "order")
 				} else {
 					reply("ok", "chaos")
 				}
+			})
 
-			case "applymove":
-				if !argcheck(2) || !gamecheck() {
-					continue
-				}
-
+			handleCommand("applymove", 2, true, func() {
 				var stone Cell
 				if msg.Arguments[0] == "O" {
 					stone = OO
@@ -206,7 +182,7 @@ func WsHandler(ws *websocket.Conn) {
 					stone = XX
 				} else {
 					reply("error", "format-error")
-					continue
+					return
 				}
 
 				if (player == currentRoom.PlayerA &&
@@ -214,18 +190,18 @@ func WsHandler(ws *websocket.Conn) {
 					(player != currentRoom.PlayerA &&
 						currentRoom.Board.Onturn == currentRoom.RoleA) {
 					reply("error", "not-on-turn")
-					continue
+					return
 				}
 
 				pos, err := strconv.Atoi(msg.Arguments[1])
 				if err != nil || pos < 0 || pos >= N*N {
 					reply("error", "format-error")
-					continue
+					return
 				}
 				empty, _ := currentRoom.Board.IsEmpty(pos)
 				if empty {
 					reply("error", "cell-not-empty")
-					continue
+					return
 				}
 
 				currentRoom.Board.ApplyMove(stone, pos)
@@ -240,7 +216,7 @@ func WsHandler(ws *websocket.Conn) {
 					}
 					currentRoom.StopGame()
 				}
-			}
+			})
 		}
 	}()
 
