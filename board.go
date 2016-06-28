@@ -18,8 +18,8 @@ const (
 type GameRole int
 
 const (
-	Order = 0
-	Chaos = 1
+	Order GameRole = 0
+	Chaos GameRole = 1
 )
 
 type Board struct {
