@@ -39,7 +39,7 @@ func WsHandler(ws *websocket.Conn) {
 			currentRoom.PlayerB = nil
 			currentRoom = nil
 
-			notifyOthers("joinroom", player.Nickname)
+			notifyOthers("leaveroom", player.Nickname)
 
 			return nil
 		}
@@ -63,6 +63,9 @@ func WsHandler(ws *websocket.Conn) {
 		} else {
 			return nil, errors.New("room-full")
 		}
+
+		notifyOthers("joinroom", player.Nickname)
+
 		return room, nil
 	}
 
