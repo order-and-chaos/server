@@ -88,7 +88,7 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 				if len(msg.Arguments) != argCount {
-					reply("error", "format")
+					reply("error", "format-nargs")
 					return
 				}
 
@@ -126,6 +126,9 @@ func WsHandler(ws *websocket.Conn) {
 					reply("error", err.Error())
 				} else {
 					reply("ok")
+					if player != currentRoom.PlayerA {
+						player.Conn.Send("joinroom", currentRoom.PlayerA.Nickname)
+					}
 				}
 			})
 			handleCommand("leaveroom", 0, false, func() { //HC [] ok [] error [err]
