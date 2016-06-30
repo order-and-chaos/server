@@ -5,28 +5,41 @@ import (
 	"fmt"
 )
 
+// OutOfRangeError tells if the given position is out of range.
+type OutOfRangeError error
+
+// N is the amount of cells per row and amount of columns.
 const N int = 6
 
+// Cell contains the state of one board cell.
 type Cell int
 
 const (
+	// Empty indicates that the cell is empty.
 	Empty Cell = -1
-	OO    Cell = 0
-	XX    Cell = 1
+	// OO is an O.
+	OO Cell = 0
+	// XX is an X.
+	XX Cell = 1
 )
 
+// GameRole indicates the type the player is
 type GameRole int
 
 const (
+	// Order gamerole
 	Order GameRole = 0
+	// Chaos gamerole
 	Chaos GameRole = 1
 )
 
+// Board contains the state of the game board
 type Board struct {
 	Cells  [N * N]Cell
 	Onturn GameRole
 }
 
+// MakeBoard creates a new board
 func MakeBoard(startPlayer GameRole) *Board {
 	bd := &Board{
 		Onturn: startPlayer,
@@ -37,6 +50,7 @@ func MakeBoard(startPlayer GameRole) *Board {
 	return bd
 }
 
+// ApplyMove applies the given move
 func (bd *Board) ApplyMove(stone Cell, pos int) error {
 	if pos < 0 || pos >= N*N {
 		return errors.New("Pos out of range in ApplyMove")
@@ -47,38 +61,28 @@ func (bd *Board) ApplyMove(stone Cell, pos int) error {
 	if bd.Cells[pos] != Empty {
 		return errors.New("Target cell not empty in ApplyMove")
 	}
+
 	bd.Cells[pos] = stone
 	if bd.Onturn == Order {
 		bd.Onturn = Chaos
 	} else {
 		bd.Onturn = Order
 	}
+
 	return nil
 }
 
+// IsEmpty checks if the cell at the given position is empty.
 func (bd *Board) IsEmpty(pos int) (bool, error) {
 	if pos < 0 || pos >= N*N {
-		return false, errors.New("Pos out of range in IsEmpty")
+		return false, OutOfRangeError(errors.New("Pos out of range in IsEmpty"))
 	}
+
 	return bd.Cells[pos] == Empty, nil
 }
 
-func (bd *Board) PrintBoard() {
-	for y := 0; y < N; y++ {
-		for x := 0; x < N; x++ {
-			if bd.Cells[N*y+x] == OO {
-				fmt.Print("O ")
-			} else if bd.Cells[N*y+x] == XX {
-				fmt.Print("X ")
-			} else {
-				fmt.Print(". ")
-			}
-		}
-		fmt.Print("\n")
-	}
-}
-
-func (bd *Board) CheckWin() (GameRole, bool) {
+// CheckWin checks if the game is over and if so who has won the game.
+func (bd *Board) CheckWin() (winner GameRole, gameOver bool) {
 	full := true
 	for i := 0; i < N*N; i++ {
 		if bd.Cells[i] == Empty {
@@ -148,4 +152,19 @@ func (bd *Board) CheckWin() (GameRole, bool) {
 	}
 
 	return GameRole(-1), false // Nobody
+}
+
+func (bd *Board) printBoard() {
+	for y := 0; y < N; y++ {
+		for x := 0; x < N; x++ {
+			if bd.Cells[N*y+x] == OO {
+				fmt.Print("O ")
+			} else if bd.Cells[N*y+x] == XX {
+				fmt.Print("X ")
+			} else {
+				fmt.Print(". ")
+			}
+		}
+		fmt.Print("\n")
+	}
 }

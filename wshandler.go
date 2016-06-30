@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// WsHandler handles the ws connection from the http server.
 func WsHandler(ws *websocket.Conn) {
 	player := makePlayer(ws)
 	var currentRoom *Room

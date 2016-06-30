@@ -9,12 +9,14 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// Connection holds state of a connection with a player.
 type Connection struct {
 	Chan      chan Message
 	ws        *websocket.Conn
 	currentID int
 }
 
+// Message is a message that is sent between the player and the server.
 type Message struct {
 	ID        int      `json:"id"`
 	Type      string   `json:"type"`
@@ -54,6 +56,7 @@ func makeConnection(ws *websocket.Conn) *Connection {
 	return conn
 }
 
+// Send sends a message with the given type and args to the current connection.
 func (conn *Connection) Send(typ string, args ...string) (n int, err error) {
 	if args == nil {
 		args = make([]string, 0)
@@ -67,6 +70,8 @@ func (conn *Connection) Send(typ string, args ...string) (n int, err error) {
 	return
 }
 
+// Reply sends a reply to the given id with the given type and args to the
+// current connection.
 func (conn *Connection) Reply(id int, typ string, args ...string) (n int, err error) {
 	if args == nil {
 		args = make([]string, 0)

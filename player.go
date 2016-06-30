@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// Player holds the state of a player.
 type Player struct {
 	Conn     *Connection
 	Nickname string

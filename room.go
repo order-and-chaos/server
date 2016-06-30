@@ -2,6 +2,7 @@ package main
 
 import "math/rand"
 
+// Room contains the state of a game room.
 type Room struct {
 	ID               string
 	PlayerA, PlayerB *Player
@@ -10,9 +11,14 @@ type Room struct {
 	Board            *Board
 }
 
+// Started returns if the game for this room has been started or not.
+func (r *Room) Started() bool {
+	return r.Board != nil
+}
+
 // StartGame starts the game of this room.
 func (r *Room) StartGame() bool {
-	if r.Board != nil {
+	if r.Started() {
 		return true
 	}
 
@@ -32,8 +38,9 @@ func (r *Room) StartGame() bool {
 	return true
 }
 
+// StopGame stops the game of this room.
 func (r *Room) StopGame() bool {
-	if r.Board == nil {
+	if !r.Started() {
 		return true
 	}
 
@@ -43,12 +50,15 @@ func (r *Room) StopGame() bool {
 	return true
 }
 
+// SendAll sends the given type and args to every player and spectator in the
+// room.
 func (r *Room) SendAll(typ string, args ...string) {
 	r.PlayerA.Conn.Send(typ, args...)
 	r.PlayerB.Conn.Send(typ, args...)
 	r.SendSpectators(typ, args...)
 }
 
+// SendSpectators sends the given type and args to every specator in the room.
 func (r *Room) SendSpectators(typ string, args ...string) {
 	for _, spec := range r.Spectators {
 		spec.Conn.Send(typ, args...)
