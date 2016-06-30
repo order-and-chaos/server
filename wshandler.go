@@ -78,6 +78,7 @@ func WsHandler(ws *websocket.Conn) {
 				close(waitch)
 				return
 			}
+			handled := false
 
 			reply := func(typ string, args ...string) {
 				player.Conn.Reply(msg.ID, typ, args...)
@@ -87,6 +88,7 @@ func WsHandler(ws *websocket.Conn) {
 				if msg.Type != typ {
 					return
 				}
+				handled = true
 
 				if len(msg.Arguments) != argCount {
 					reply("error", "format-nargs")
@@ -232,6 +234,10 @@ func WsHandler(ws *websocket.Conn) {
 					currentRoom.StopGame()
 				}
 			})
+
+			if !handled {
+				reply("error", "unknown-command", msg.Type)
+			}
 		}
 	}()
 
