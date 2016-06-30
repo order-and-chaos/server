@@ -13,6 +13,8 @@ func WsHandler(ws *websocket.Conn) {
 	var currentRoom *Room
 	waitch := make(chan int)
 
+	// TODO: handle ping/pong timeouts
+
 	notifyOthers := func(typ string, args ...string) {
 		if currentRoom == nil {
 			return
