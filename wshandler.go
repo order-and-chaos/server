@@ -54,20 +54,26 @@ func WsHandler(ws *websocket.Conn) {
 		if currentRoom != nil {
 			leaveRoom()
 		}
+
 		room := getRoom(id)
 		if room == nil {
 			return nil, errors.New("not-found")
-		} else if room.PlayerA == nil {
-			room.PlayerA = player
-			currentRoom = room
-		} else if room.PlayerB == nil {
-			room.PlayerB = player
-			currentRoom = room
-		} else {
-			return nil, errors.New("room-full")
 		}
 
-		notifyOthers("joinroom", player.Nickname)
+		playerA, err := room.AddPlayer(player)
+		if err != nil {
+			return nil, err
+		}
+
+		var str string
+		if playerA {
+			str = "0"
+		} else {
+			str = "1"
+		}
+		notifyOthers("joinroom", player.Nickname, str)
+
+		currentRoom = room
 
 		return room, nil
 	}

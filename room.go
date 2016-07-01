@@ -1,6 +1,9 @@
 package main
 
-import "math/rand"
+import (
+	"errors"
+	"math/rand"
+)
 
 // Room contains the state of a game room.
 type Room struct {
@@ -61,6 +64,21 @@ func (r *Room) StopGame() bool {
 	r.SendAll("stopgame")
 
 	return true
+}
+
+// AddPlayer adds the given player to the current game.
+func (r *Room) AddPlayer(player *Player) (playerA bool, err error) {
+	if r.PlayerA == nil {
+		r.PlayerA = player
+		playerA = true
+	} else if r.PlayerB == nil {
+		r.PlayerB = player
+		playerA = false
+	} else {
+		return false, errors.New("room-full")
+	}
+
+	return playerA, nil
 }
 
 // AddSpectator adds the given player to the game as a spectator.
