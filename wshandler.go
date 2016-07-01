@@ -114,12 +114,22 @@ func WsHandler(ws *websocket.Conn) {
 				reply("pong")
 			})
 
-			handleCommand("setnick", 1, false, func() { //HC [nick] ok [nick]
-				oldNick := player.Nickname
-				player.Nickname = msg.Arguments[0]
-				notifyOthers("setnick", oldNick, player.Nickname)
-				reply("ok", player.Nickname)
+			handleCommand("setnick", 1, false, func() { //HC [nick] ok [nick] error [err]
+				old := player.Nickname
+				new := msg.Arguments[0]
+				if old == new {
+					reply("ok", old)
+					return
+				}
 
+				if nicknameExists(new) {
+					reply("error", "nick-taken")
+					return
+				}
+
+				player.Nickname = new
+				notifyOthers("setnick", old, new)
+				reply("ok", new)
 			})
 			handleCommand("getnick", 0, false, func() { //HC [] ok [nick]
 				reply("ok", player.Nickname)
@@ -244,4 +254,13 @@ func WsHandler(ws *websocket.Conn) {
 	}()
 
 	<-waitch
+
+	// remove player from players slice
+	var index int
+	for i, p := range players {
+		if p == player {
+			index = i
+		}
+	}
+	players = append(players[:index], players[index+1:]...)
 }
