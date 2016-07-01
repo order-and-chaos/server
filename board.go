@@ -44,9 +44,11 @@ func MakeBoard(startPlayer GameRole) *Board {
 	bd := &Board{
 		Onturn: startPlayer,
 	}
+
 	for i := 0; i < N*N; i++ {
 		bd.Cells[i] = Empty
 	}
+
 	return bd
 }
 

@@ -28,7 +28,7 @@ func (r *Room) Started() bool {
 }
 
 // StartGame starts the game of this room.
-func (r *Room) StartGame() bool {
+func (r *Room) StartGame() (started bool) {
 	if r.Started() {
 		return true
 	}
