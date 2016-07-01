@@ -152,20 +152,18 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok", player.Nickname)
 			})
 
-			handleCommand("joinroom", 1, func() { //HC [id] ok [index] error [err]
+			handleCommand("joinroom", 1, func() { //HC [id] ok [othernick?] error [err]
 				playerA, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
 					return
 				}
 
-				var str string
 				if playerA {
-					str = "0"
+					reply("ok")
 				} else {
-					str = "1"
+					reply("ok", currentRoom.PlayerA.Nickname)
 				}
-				reply("ok", str)
 			})
 			handleCommand("spectateroom", 1, func() { //HC [id] ok [] error [err]
 				if currentRoom != nil {
