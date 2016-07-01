@@ -139,12 +139,9 @@ func WsHandler(ws *websocket.Conn) {
 				_, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
-				} else {
-					reply("ok")
-					if player != currentRoom.PlayerA {
-						player.Conn.Send("joinroom", currentRoom.PlayerA.Nickname)
-					}
+					return
 				}
+				reply("ok")
 			})
 			handleCommand("spectateroom", 1, false, func() { //HC [id] ok [] error [err]
 				if currentRoom != nil {
