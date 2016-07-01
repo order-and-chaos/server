@@ -1,19 +1,32 @@
 #!/bin/bash
 
 function handleline() {
-	local name nargs ingame args plural resp
+	local name nargs inthing args resp
+	case "$1" in
+	Comm) inthing=""; ;;
+	Room) inthing=" (in room)"; ;;
+	Game) inthing=" (in game)"; ;;
+	esac
+	shift
+
 	name=$1; shift
 	nargs=$1; shift
-	if test "$1" = "true"; then ingame=" (in game)"; else ingame=""; fi; shift
 	args=$1; shift
 	resp="$*"
 
-	if test "$nargs" -eq 1; then plural=""; else plural="s"; fi
-
-	printf "%s %s%s -> %s\n" "$name" "$args" "$ingame" "$resp"
+	printf "%s %s%s -> %s\n" "$name" "$args" "$inthing" "$resp"
 }
 
-lines="$(grep 'handleCommand(' wshandler.go | cut -d\( -f2- | tr -d \" | sed 's/,,\? / /g' | sed 's/ func() { \/\/HC / /')"
+lines="$(
+	grep 'handle\(Room\|Game\)\?Command(' wshandler.go \
+	| sed 's/\t\+//' \
+	| grep '//HC' \
+	| tr -d \" \
+	| sed 's/,,\? / /g' \
+	| sed 's/ func() { \/\/HC / /' \
+	| sed 's/handleCommand/Comm/' \
+	| tr \( \  \
+	| sed 's/handle\|Command//g')"
 IFS=$'\n'
 for line in $lines; do
 	IFS=" "
