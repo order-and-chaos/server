@@ -255,6 +255,8 @@ func WsHandler(ws *websocket.Conn) {
 
 	<-waitch
 
+	leaveRoom()
+
 	// remove player from players slice
 	var index int
 	for i, p := range players {
