@@ -65,6 +65,8 @@ func WsHandler(ws *websocket.Conn) {
 			return false, err
 		}
 
+		currentRoom = room
+
 		var str string
 		if playerA {
 			str = "0"
@@ -72,8 +74,6 @@ func WsHandler(ws *websocket.Conn) {
 			str = "1"
 		}
 		notifyOthers("joinroom", player.Nickname, str)
-
-		currentRoom = room
 
 		return playerA, nil
 	}
