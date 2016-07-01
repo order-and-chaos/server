@@ -175,6 +175,11 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok", room.ID)
 			})
 
+			handleCommand("sendroomchat", 1, true, func() { //HC [] ok []
+				notifyOthers("chatmessage", player.Nickname, msg.Arguments[0])
+				reply("ok")
+			})
+
 			handleCommand("startgame", 0, false, func() { //HC [] ok [] error [err]
 				if currentRoom == nil {
 					reply("error", "not-in-room")
