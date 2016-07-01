@@ -33,6 +33,13 @@ const (
 	Chaos GameRole = 1
 )
 
+func (role GameRole) String() string {
+	if role == Order {
+		return "order"
+	}
+	return "chaos"
+}
+
 // Board contains the state of the game board
 type Board struct {
 	Cells  [N * N]Cell

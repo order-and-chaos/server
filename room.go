@@ -6,7 +6,7 @@ import "math/rand"
 type Room struct {
 	ID               string
 	PlayerA, PlayerB *Player
-	RoleA            GameRole
+	RoleA, RoleB     GameRole
 	Spectators       []*Player
 	Board            *Board
 }
@@ -37,14 +37,16 @@ func (r *Room) StartGame() (started bool) {
 		return false
 	}
 
-	r.SendAll("startgame")
-
 	if rand.Intn(2) == 0 {
 		r.RoleA = Order
+		r.RoleB = Chaos
 	} else {
 		r.RoleA = Chaos
+		r.RoleB = Chaos
 	}
 	r.Board = MakeBoard(Order)
+
+	r.SendAll("startgame", r.RoleA.String(), r.RoleB.String())
 
 	return true
 }
