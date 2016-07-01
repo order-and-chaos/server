@@ -11,6 +11,17 @@ type Room struct {
 	Board            *Board
 }
 
+var roomMap map[string]*Room
+
+func makeRoom() *Room {
+	id := UniqIdf()
+	room := &Room{
+		ID: id,
+	}
+	roomMap[id] = room
+	return room
+}
+
 // Started returns if the game for this room has been started or not.
 func (r *Room) Started() bool {
 	return r.Board != nil

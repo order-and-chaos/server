@@ -13,17 +13,6 @@ import (
 
 const defaultPort = "1337"
 
-var roomMap = make(map[string]*Room)
-
-func mkRoom() *Room {
-	id := UniqIdf()
-	room := &Room{
-		ID: id,
-	}
-	roomMap[id] = room
-	return room
-}
-
 func getRoom(id string) *Room {
 	return roomMap[id]
 }
