@@ -27,7 +27,15 @@ func nicknameExists(nick string) bool {
 }
 
 func genNickname() string {
-	return fmt.Sprintf("%s%d", nameBases[rand.Intn(len(nameBases))], rand.Intn(1000))
+	var nick string
+
+	loop := true
+	for loop {
+		nick = fmt.Sprintf("%s%d", nameBases[rand.Intn(len(nameBases))], rand.Intn(1000))
+		loop = nicknameExists(nick)
+	}
+
+	return nick
 }
 
 func makePlayer(ws *websocket.Conn) *Player {
