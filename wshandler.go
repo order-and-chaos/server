@@ -50,19 +50,19 @@ func WsHandler(ws *websocket.Conn) {
 		return errors.New("not-in-room")
 	}
 
-	joinRoom := func(id string) (*Room, error) {
+	joinRoom := func(id string) (playerA bool, err error) {
 		if currentRoom != nil {
 			leaveRoom()
 		}
 
 		room := getRoom(id)
 		if room == nil {
-			return nil, errors.New("not-found")
+			return false, errors.New("not-found")
 		}
 
-		playerA, err := room.AddPlayer(player)
+		playerA, err = room.AddPlayer(player)
 		if err != nil {
-			return nil, err
+			return false, err
 		}
 
 		var str string
@@ -75,7 +75,7 @@ func WsHandler(ws *websocket.Conn) {
 
 		currentRoom = room
 
-		return room, nil
+		return playerA, nil
 	}
 
 	go func() {
@@ -142,12 +142,19 @@ func WsHandler(ws *websocket.Conn) {
 			})
 
 			handleCommand("joinroom", 1, false, func() { //HC [id] ok [] error [err]
-				_, err := joinRoom(msg.Arguments[0])
+				playerA, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
 					return
 				}
-				reply("ok")
+
+				var str string
+				if playerA {
+					str = "0"
+				} else {
+					str = "1"
+				}
+				reply("ok", str)
 			})
 			handleCommand("spectateroom", 1, false, func() { //HC [id] ok [] error [err]
 				if currentRoom != nil {
