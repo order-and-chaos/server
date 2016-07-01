@@ -82,7 +82,6 @@ func WsHandler(ws *websocket.Conn) {
 		for {
 			msg, open := <-player.Conn.Chan
 			if !open {
-				leaveRoom()
 				close(waitch)
 				return
 			}
