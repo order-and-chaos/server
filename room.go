@@ -61,6 +61,11 @@ func (r *Room) StopGame() bool {
 	return true
 }
 
+// AddSpectator adds the given player to the game as a spectator.
+func (r *Room) AddSpectator(player *Player) {
+	r.Spectators = append(r.Spectators, player)
+}
+
 // SendAll sends the given type and args to every player and spectator in the
 // room.
 func (r *Room) SendAll(typ string, args ...string) {

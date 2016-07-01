@@ -146,6 +146,21 @@ func WsHandler(ws *websocket.Conn) {
 					}
 				}
 			})
+			handleCommand("spectateroom", 1, false, func() { //HC [id] ok [] error [err]
+				if currentRoom != nil {
+					leaveRoom()
+				}
+
+				room := getRoom(msg.Arguments[0])
+				if room == nil {
+					reply("error", "not-found")
+					return
+				}
+
+				room.AddSpectator(player)
+				currentRoom = room
+				reply("ok")
+			})
 			handleCommand("leaveroom", 0, false, func() { //HC [] ok [] error [err]
 				err := leaveRoom()
 				if err != nil {
