@@ -177,10 +177,8 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok")
 			})
 
-			handleCommand("startgame", 0, false, func() { //HC [] ok [] error [err]
-				if currentRoom == nil {
-					reply("error", "not-in-room")
-				} else if currentRoom.Board != nil {
+			handleCommand("startgame", 0, true, func() { //HC [] ok [] error [err]
+				if currentRoom.Board != nil {
 					reply("error", "already-in-game")
 				} else if !currentRoom.StartGame() {
 					reply("error", "not-ready")
