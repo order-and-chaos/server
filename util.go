@@ -19,7 +19,7 @@ func FormatID(id uint64) string {
 	return fmt.Sprintf("%03s", strconv.FormatUint(id*46649%6125, 36))
 }
 
-// UniqIdf returns a new 'random' string id and increaes the index
-func UniqIdf() string {
+// UniqIDf returns a new 'random' string id and increaes the index
+func UniqIDf() string {
 	return FormatID(UniqID())
 }

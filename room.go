@@ -17,7 +17,7 @@ type Room struct {
 var roomMap = make(map[string]*Room)
 
 func makeRoom() *Room {
-	id := UniqIdf()
+	id := UniqIDf()
 	room := &Room{
 		ID: id,
 	}
