@@ -9,8 +9,9 @@ import (
 
 // Player holds the state of a player.
 type Player struct {
-	Conn     *Connection
+	ID       string
 	Nickname string
+	Conn     *Connection
 }
 
 var players []*Player
@@ -40,8 +41,9 @@ func genNickname() string {
 
 func makePlayer(ws *websocket.Conn) *Player {
 	player := &Player{
-		Conn:     makeConnection(ws),
+		ID:       UniqIDf(),
 		Nickname: genNickname(),
+		Conn:     makeConnection(ws),
 	}
 	players = append(players, player)
 	return player
