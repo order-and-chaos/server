@@ -195,7 +195,7 @@ func WsHandler(ws *websocket.Conn) {
 			})
 
 			handleRoomCommand("sendroomchat", 1, func() { //HC [msg] ok []
-				notifyOthers("chatmessage", player.Nickname, msg.Arguments[0])
+				notifyOthers("chatmessage", player.Nickname, currentRoom.ID, msg.Arguments[0])
 				reply("ok")
 			})
 
