@@ -55,7 +55,7 @@ func WsHandler(ws *websocket.Conn) {
 			leaveRoom()
 		}
 
-		room := getRoom(id)
+		room := roomMap[id]
 		if room == nil {
 			return false, errors.New("not-found")
 		}
@@ -170,7 +170,7 @@ func WsHandler(ws *websocket.Conn) {
 					leaveRoom()
 				}
 
-				room := getRoom(msg.Arguments[0])
+				room := roomMap[msg.Arguments[0]]
 				if room == nil {
 					reply("error", "not-found")
 					return

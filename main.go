@@ -13,10 +13,6 @@ import (
 
 const defaultPort = "1337"
 
-func getRoom(id string) *Room {
-	return roomMap[id]
-}
-
 func printHelp() {
 	fmt.Printf("usage: %s [port=%s]\n", os.Args[0], defaultPort)
 }
