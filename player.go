@@ -48,3 +48,13 @@ func makePlayer(ws *websocket.Conn) *Player {
 	players = append(players, player)
 	return player
 }
+
+func getPlayer(nickname string) *Player {
+	for _, player := range players {
+		if player.Nickname == nickname {
+			return player
+		}
+	}
+
+	return nil
+}
