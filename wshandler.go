@@ -40,9 +40,9 @@ func WsHandler(ws *websocket.Conn) {
 				currentRoom.PlayerA = currentRoom.PlayerB
 			}
 			currentRoom.PlayerB = nil
-			currentRoom = nil
 
 			notifyOthers("leaveroom", player.Nickname)
+			currentRoom = nil
 
 			return nil
 		}
