@@ -188,7 +188,7 @@ func WsHandler(ws *websocket.Conn) {
 					reply("ok")
 				}
 			})
-			handleCommand("makeroom", 0, func() { //HC [] ok []
+			handleCommand("makeroom", 0, func() { //HC [] ok [id]
 				room := makeRoom()
 				joinRoom(room.ID)
 				reply("ok", room.ID)
