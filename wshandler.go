@@ -31,7 +31,11 @@ func WsHandler(ws *websocket.Conn) {
 			other.Conn.Send(typ, args...)
 		}
 
-		currentRoom.SendSpectators(typ, args...)
+		for _, spec := range currentRoom.Spectators {
+			if spec != player {
+				spec.Conn.Send(typ, args...)
+			}
+		}
 	}
 
 	leaveRoom := func() error {
