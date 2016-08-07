@@ -89,8 +89,12 @@ func (r *Room) AddSpectator(player *Player) {
 // SendAll sends the given type and args to every player and spectator in the
 // room.
 func (r *Room) SendAll(typ string, args ...string) {
-	r.PlayerA.Conn.Send(typ, args...)
-	r.PlayerB.Conn.Send(typ, args...)
+	if r.PlayerA != nil {
+		r.PlayerA.Conn.Send(typ, args...)
+	}
+	if r.PlayerB != nil {
+		r.PlayerB.Conn.Send(typ, args...)
+	}
 	r.SendSpectators(typ, args...)
 }
 
