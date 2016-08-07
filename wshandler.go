@@ -152,7 +152,7 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok", player.Nickname)
 			})
 
-			handleCommand("joinroom", 1, func() { //HC [id] ok [othernick?] error [err]
+			handleCommand("joinroom", 1, func() { //HC [id] ok [roomid, othernick?] error [err]
 				playerA, err := joinRoom(msg.Arguments[0])
 				if err != nil {
 					reply("error", err.Error())
@@ -160,12 +160,12 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 				if playerA {
-					reply("ok")
+					reply("ok", msg.Arguments[0])
 				} else {
-					reply("ok", currentRoom.PlayerA.Nickname)
+					reply("ok", msg.Arguments[0], currentRoom.PlayerA.Nickname)
 				}
 			})
-			handleCommand("spectateroom", 1, func() { //HC [id] ok [] error [err]
+			handleCommand("spectateroom", 1, func() { //HC [id] ok [roomid] error [err]
 				if currentRoom != nil {
 					leaveRoom()
 				}
@@ -178,7 +178,7 @@ func WsHandler(ws *websocket.Conn) {
 
 				room.AddSpectator(player)
 				currentRoom = room
-				reply("ok")
+				reply("ok", room.ID)
 			})
 			handleCommand("leaveroom", 0, func() { //HC [] ok [] error [err]
 				err := leaveRoom()
