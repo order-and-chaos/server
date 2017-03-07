@@ -62,7 +62,7 @@ func MakeBoard(startPlayer GameRole) *Board {
 // ApplyMove applies the given move
 func (bd *Board) ApplyMove(stone Cell, pos int) error {
 	if pos < 0 || pos >= N*N {
-		return errors.New("Pos out of range in ApplyMove")
+		return OutOfRangeError(errors.New("Pos out of range in ApplyMove"))
 	}
 	if stone == Empty {
 		return errors.New("Cannot set cell to empty in ApplyMove")

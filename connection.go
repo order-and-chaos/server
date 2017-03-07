@@ -62,12 +62,11 @@ func (conn *Connection) Send(typ string, args ...string) (n int, err error) {
 		args = make([]string, 0)
 	}
 	conn.currentID++
-	n, err = conn.write(Message{
+	return conn.write(Message{
 		ID:        conn.currentID,
 		Type:      typ,
 		Arguments: args,
 	})
-	return
 }
 
 // Reply sends a reply to the given id with the given type and args to the

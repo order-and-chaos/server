@@ -245,16 +245,6 @@ func WsHandler(ws *websocket.Conn) {
 			})
 
 			handleGameCommand("applymove", 2, func() { //HC [O/X,pos] ok [] error [err]
-				var stone Cell
-				if msg.Arguments[0] == "O" {
-					stone = OO
-				} else if msg.Arguments[0] == "X" {
-					stone = XX
-				} else {
-					reply("error", "format-error")
-					return
-				}
-
 				if (player == currentRoom.PlayerA &&
 					currentRoom.Board.Onturn != currentRoom.RoleA) ||
 					(player != currentRoom.PlayerA &&
@@ -268,13 +258,25 @@ func WsHandler(ws *websocket.Conn) {
 					reply("error", "format-error")
 					return
 				}
+
 				empty, _ := currentRoom.Board.IsEmpty(pos)
 				if empty {
 					reply("error", "cell-not-empty")
 					return
 				}
 
+				var stone Cell
+				if msg.Arguments[0] == "O" {
+					stone = OO
+				} else if msg.Arguments[0] == "X" {
+					stone = XX
+				} else {
+					reply("error", "format-error")
+					return
+				}
+
 				currentRoom.Board.ApplyMove(stone, pos)
+
 				reply("ok")
 
 				role, win := currentRoom.Board.CheckWin()
