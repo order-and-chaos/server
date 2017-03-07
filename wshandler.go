@@ -260,7 +260,7 @@ func WsHandler(ws *websocket.Conn) {
 				}
 
 				empty, _ := currentRoom.Board.IsEmpty(pos)
-				if empty {
+				if !empty {
 					reply("error", "cell-not-empty")
 					return
 				}
