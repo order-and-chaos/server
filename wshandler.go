@@ -203,6 +203,23 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok")
 			})
 
+			handleRoomCommand("ready", 1, func() { //HC [ready] ok []
+				arg := msg.Arguments[0]
+				if arg != "0" && arg != "1" {
+					reply("error", "format-error")
+					return
+				}
+
+				old := player.Ready
+				player.Ready = msg.Arguments[0] == "1"
+
+				if old != player.Ready {
+					notifyOthers("ready", player.Nickname, msg.Arguments[0])
+				}
+
+				reply("ok")
+			})
+
 			handleRoomCommand("startgame", 0, func() { //HC [] ok [] error [err]
 				if currentRoom.Board != nil {
 					reply("error", "already-in-game")

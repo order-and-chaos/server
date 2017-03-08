@@ -11,6 +11,7 @@ import (
 type Player struct {
 	ID       string
 	Nickname string
+	Ready    bool
 	Conn     *Connection
 }
 

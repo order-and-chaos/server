@@ -36,7 +36,11 @@ func (r *Room) StartGame() (started bool) {
 		return true
 	}
 
-	if r.PlayerA == nil || r.PlayerB == nil {
+	playerReady := func(player *Player) bool {
+		return player != nil && player.Ready
+	}
+
+	if !playerReady(r.PlayerA) || !playerReady(r.PlayerB) {
 		return false
 	}
 
