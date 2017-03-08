@@ -45,7 +45,7 @@ func (r *Room) StartGame() (started bool) {
 		r.RoleB = Chaos
 	} else {
 		r.RoleA = Chaos
-		r.RoleB = Chaos
+		r.RoleB = Order
 	}
 	r.Board = MakeBoard(Order)
 
