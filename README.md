@@ -1,5 +1,6 @@
-# Order and chaos
+# order-and-chaos/server
 
-A simple, terminal-based, multiplayer order-and-chaos game.
+The reference server for the multiplayer order-and-chaos game protocol.
+Written in Go.
 
 By Lieuwe Rooijakkers & Tom Smeding
