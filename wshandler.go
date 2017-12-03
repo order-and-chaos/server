@@ -198,6 +198,16 @@ func WsHandler(ws *websocket.Conn) {
 				reply("ok", room.ID)
 			})
 
+			handleCommand("sendchat", 2, func() { //HC [person, msg] ok [] error [err]
+				other := getPlayer(msg.Arguments[0])
+				if other == nil {
+					reply("error", "player-not-found", msg.Arguments[0])
+				}
+
+				other.Conn.Send("chatmessage", player.Nickname, other.Nickname, msg.Arguments[1])
+
+				reply("ok")
+			})
 			handleRoomCommand("sendroomchat", 1, func() { //HC [msg] ok []
 				notifyOthers("chatmessage", player.Nickname, currentRoom.ID, msg.Arguments[0])
 				reply("ok")
